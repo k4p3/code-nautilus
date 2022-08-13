@@ -11,6 +11,7 @@ require_version('Nautilus', '3.0')
 from gi.repository import Nautilus, GObject
 from subprocess import call
 import os
+import locale
 
 # path to vscode
 VSCODE = 'code'
@@ -21,6 +22,24 @@ VSCODENAME = 'Code'
 # always create new window?
 NEWWINDOW = False
 
+# ui language check
+locale.setlocale(locale.LC_ALL, "")
+LANG = locale.getlocale(locale.LC_MESSAGES)[0]
+LABEL = ""
+
+
+if "es_MX" in LANG:
+    LABEL = 'Abrir con' + VSCODENAME
+    TIP_FILES = 'Abrir los archivos con VSCode'
+    TIP_BACKGROUND = 'Abrir directorio con VSCode'
+elif "zh_CN" in LANG:
+    LABEL = '在 ' + VSCODENAME + ' 中打开'
+    TIP_FILES = '用 VSCode 打开所选择的文件'
+    TIP_BACKGROUND = '在 VSCode 中打开当前目录'
+else:
+    LABEL = 'Open in ' + VSCODENAME
+    TIP_FILES = 'Opens the selected files with VSCode'
+    TIP_BACKGROUND = 'Opens the current directory in VSCode'
 
 class VSCodeExtension(GObject.GObject, Nautilus.MenuProvider):
 
@@ -45,8 +64,8 @@ class VSCodeExtension(GObject.GObject, Nautilus.MenuProvider):
     def get_file_items(self, window, files):
         item = Nautilus.MenuItem(
             name='VSCodeOpen',
-            label='Open in ' + VSCODENAME,
-            tip='Opens the selected files with VSCode'
+            label=LABEL,
+            tip=TIP_FILES
         )
         item.connect('activate', self.launch_vscode, files)
 
@@ -55,8 +74,8 @@ class VSCodeExtension(GObject.GObject, Nautilus.MenuProvider):
     def get_background_items(self, window, file_):
         item = Nautilus.MenuItem(
             name='VSCodeOpenBackground',
-            label='Open in ' + VSCODENAME,
-            tip='Opens the current directory in VSCode'
+            label=LABEL,
+            tip=TIP_BACKGROUND
         )
         item.connect('activate', self.launch_vscode, [file_])
 
